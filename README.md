@@ -1,57 +1,120 @@
+<div align="center">
+
 # Panoptic
 
-Panoptic adds practical Markdown authoring features to [Zed](https://zed.dev): local link and heading completion, diagnostics for broken references, link hover details, and snippets. It works with ordinary `.md` files and Zed's built-in Markdown language.
+### Markdown authoring support for Zed
+
+Link completion, diagnostics, hover details, and snippets for ordinary Markdown files.
+
+[![Release](https://img.shields.io/github/v/release/kaiju-no-9/panoptic?label=release)](https://github.com/kaiju-no-9/panoptic/releases)
+[![Release workflow](https://github.com/kaiju-no-9/panoptic/actions/workflows/release.yml/badge.svg)](https://github.com/kaiju-no-9/panoptic/actions/workflows/release.yml)
+![Rust](https://img.shields.io/badge/Rust-extension%20%2B%20LSP-000000?logo=rust)
+
+</div>
+
+---
+
+## What is Panoptic?
+
+Panoptic is a Zed extension that makes writing Markdown more reliable. It attaches to Zed's built-in **Markdown** language and works with regular `.md` files. The extension provides editor assistance through a small Rust language server and Zed's native snippet support.
 
 ## Features
 
-- **Completion** of relative file links `[text](./docs/…)` and heading anchors `[text](./file.md#…)` / `[text](#…)`.
-- **Diagnostics** (warnings only):
-  - `missing-alt`: image has empty alt text.
-  - `broken-link`: relative link target does not exist.
-  - `broken-image`: local image file does not exist.
-  - `broken-anchor`: `#fragment` matches no heading (in this file or the target Markdown file).
-- **Hover** on a link: resolved path, whether it exists, and the target heading. Remote URLs are shown as text; nothing is fetched.
-- **Snippets**: `h1`, `h2`, `link`, `image`, `task`, `quote`, `code`, `table`.
+| Capability | What Panoptic does |
+|---|---|
+| **Link completion** | Suggests relative files and folders inside Markdown link destinations. |
+| **Heading completion** | Suggests same-file or target-file anchors after `#` in a link. |
+| **Diagnostics** | Warns about missing image alt text, broken local links and images, and missing heading anchors. |
+| **Hover** | Shows local target details and heading information; remote URLs are shown as text only. |
+| **Snippets** | Provides `h1`, `h2`, `link`, `image`, `task`, `quote`, `code`, and `table`. |
+| **Rendered reading** | Works alongside Zed's built-in Markdown preview. |
 
-Anchors use GitHub-style slugs: lowercase, spaces to `-`, punctuation dropped, Unicode letters kept, duplicates get `-1`, `-2`, …. Empty headings produce no anchor.
+Heading anchors use GitHub-style slugs: lowercase, spaces become hyphens, punctuation is dropped, Unicode letters are kept, and repeated headings receive suffixes such as `-1` and `-2`.
 
-Remote URLs, `mailto:` links, links inside code, and targets outside the workspace are never reported. No network access, telemetry or file modification.
+Remote URLs, `mailto:` links, links inside code, and targets outside the workspace are excluded from local-reference diagnostics. Panoptic does not fetch URLs, send telemetry, or modify files automatically.
 
-## Scope
+## Install for development
 
-Panoptic does not provide Typora-style inline WYSIWYG editing. Zed's extension API does not expose a custom editor surface. It also does not add a custom preview, wiki-links, backlinks, formatting, or code actions.
+Panoptic is not published in Zed's extension registry yet. To install it locally:
 
-## Rendered preview
+1. Clone this repository and open it in Zed.
+2. Open the Command Palette with **Cmd+Shift+P** and run **zed: install dev extension**.
+3. Select the repository directory containing `extension.toml`.
+4. Open a `.md` file. Panoptic uses `panoptic-lsp` on your `PATH` if available; otherwise, it downloads the matching binary from the [latest GitHub release](https://github.com/kaiju-no-9/panoptic/releases/latest).
 
-Open a `.md` file, open Zed's Command Palette, and search for **Markdown: Open Preview**. The rendered preview is a reading view; edit the original Markdown source buffer as usual.
+Zed builds the extension for `wasm32-wasip2`. When developing, install Rust with `rustup`; Zed can install the target automatically.
 
-## Installation
+To build the language server locally and avoid downloading a release binary:
 
-1. In Zed's Command Palette, run **zed: extensions**, choose **Install Dev Extension**, and select this repository (the directory containing `extension.toml`). Zed compiles the extension; install Rust with `rustup` if needed.
-2. Panoptic uses `panoptic-lsp` from `PATH` when available. Otherwise, it downloads a matching binary from the latest stable GitHub release of `kaiju-no-9/panoptic`.
-3. To build the server locally, run `cargo build --release --manifest-path server/Cargo.toml`, then add `server/target/release` to `PATH`. Alternatively, run `cargo install --path server`.
+```sh
+cargo build --release --manifest-path server/Cargo.toml
+```
 
-## Supported platforms
+Add `server/target/release` to `PATH` so Zed can find `panoptic-lsp`.
 
-macOS (Apple Silicon, Intel), Linux (x86-64, ARM64), Windows (x86-64). Other platforms get a readable error; build the server from source instead.
+## Try it
+
+In a Markdown source file inside the project, add a link to a file that does not exist:
+
+```md
+[missing](./does-not-exist.md)
+```
+
+Panoptic should underline the destination. Hover over it to read the warning, or press **Cmd+Shift+M** to open project diagnostics. You can try the other features with these examples:
+
+```md
+![](./missing-image.png)
+[section](./README.md#)
+```
+
+Type `h1` or `link` in a Markdown buffer to try snippets. For rendered reading, use **Cmd+Shift+P → `markdown: open preview`**. The preview is separate from the source editor; Panoptic does not provide inline WYSIWYG editing.
+
+## How it works
+
+```text
+Zed Markdown buffer
+        |
+        +-- Panoptic extension (Rust compiled to WASM)
+        |       finds or downloads the native server
+        |
+        +-- panoptic-lsp (native Rust process)
+                link and heading analysis
+                diagnostics, completions, and hover
+```
+
+Zed remains responsible for editing, syntax highlighting, file buffers, and the rendered preview. The Markdown file stays the source of truth.
+
+## Supported release targets
+
+The GitHub release workflow builds the native language server for:
+
+- macOS Apple Silicon and Intel
+- Linux x86-64 and ARM64
+- Windows x86-64
+
+Panoptic has been manually verified in Zed on macOS Apple Silicon, including server startup and a broken-link warning. Other platforms are release build targets and still need hands-on validation.
+
+## Develop and test
+
+Run the language-server tests and build the extension with:
+
+```sh
+cargo test --manifest-path server/Cargo.toml
+rustup target add wasm32-wasip2
+cargo build --release --target wasm32-wasip2
+```
+
+To build only the native server, run `cargo build --release --manifest-path server/Cargo.toml`.
+
+## Limitations
+
+- No Typora-style inline WYSIWYG editing; Zed's public extension API does not provide a custom editor surface.
+- No custom Markdown preview, wiki-links, backlinks, formatting, or code actions.
+- Documents use full-text synchronization and are re-analyzed after changes, so very large Markdown files may take longer.
+- The extension has not been published to the Zed registry.
 
 ## Troubleshooting
 
-- Run `zed: open log` and look for `Panoptic Markdown LSP` or extension errors. `zed --foreground` gives more output.
-- "no asset" / download errors: no release exists yet or no network. Build the server from source and put it on `PATH`.
-- No diagnostics for `../` links that leave the workspace: this is intentional.
-
-## Development
-
-```sh
-cargo test --manifest-path server/Cargo.toml     # server unit + integration tests
-cargo build --release --target wasm32-wasip2     # extension (needs: rustup target add wasm32-wasip2)
-```
-
-## Current status and remaining work
-
-- Server unit and integration tests, including an in-process LSP lifecycle test, are present. The extension has been built for WASM. **It still needs validation inside Zed** as a development extension.
-- The release workflow defines builds for macOS (Apple Silicon and Intel), Linux (x86-64 and ARM64), and Windows (x86-64). These release artifacts still need a tagged release and platform validation.
-- Panoptic has not been published to the Zed extension registry.
-- The server uses full-document synchronization and re-analyzes a document after changes; very large files may be slower.
-- Inline WYSIWYG rendering is outside the current Zed extension API and is not part of this project.
+- Use **Cmd+Shift+P → `zed: open log`** and search for `Panoptic` if the language server does not start.
+- If Zed reports a missing release asset, check the [GitHub releases](https://github.com/kaiju-no-9/panoptic/releases) for an asset matching your platform, or build the server locally and add it to `PATH`.
+- Links that leave the workspace are intentionally not reported.
