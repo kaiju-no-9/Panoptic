@@ -2,3 +2,5 @@ target/
 server/target/
 *.wasm
 .DS_Store
+bui
+build.md

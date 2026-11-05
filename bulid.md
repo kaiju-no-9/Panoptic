@@ -6,7 +6,21 @@
 **Target editor:** Zed  
 **Implementation:** Zed extension (Rust/WASM) + a small native Rust language server  
 **Primary goal:** Make working with Markdown in Zed more pleasant while staying inside Zed's supported extension system.  
-**Status:** Implementation brief for an AI coding agent or developer
+**Status:** MVP implementation exists; the remaining release and in-Zed validation work is listed below.
+
+> This file began as an implementation brief. The repository now contains the extension, LSP server, snippets, tests, and release workflow described here. Treat the steps below as the design record and acceptance checklist; use `README.md` for current user-facing setup instructions.
+
+### Current implementation snapshot
+
+| Area | State |
+|---|---|
+| Zed extension and Markdown language registration | Implemented; WASM build recorded in project notes |
+| Native LSP, diagnostics, completions, hover, and snippets | Implemented; server tests and LSP lifecycle test are present |
+| Cross-platform server release workflow | Configured for five target triples; release artifacts have not yet been validated across platforms |
+| Install and use inside Zed | Still needs a manual development-extension check |
+| Zed extension registry publication | Not published |
+
+The implementation and this checklist may differ in details. When updating the code, keep `README.md`, `CHANGELOG.md`, and `docs/zed-api-notes.md` aligned with verified behavior.
 
 ---
 

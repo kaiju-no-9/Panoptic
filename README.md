@@ -1,8 +1,8 @@
 # Panoptic
 
-A lightweight Markdown authoring extension for [Zed](https://zed.dev). It works on ordinary `.md` files and adds link completion, diagnostics, hover and snippets on top of Zed's built-in Markdown support.
+Panoptic adds practical Markdown authoring features to [Zed](https://zed.dev): local link and heading completion, diagnostics for broken references, link hover details, and snippets. It works with ordinary `.md` files and Zed's built-in Markdown language.
 
-## What it does
+## Features
 
 - **Completion** of relative file links `[text](./docs/…)` and heading anchors `[text](./file.md#…)` / `[text](#…)`.
 - **Diagnostics** (warnings only):
@@ -17,19 +17,19 @@ Anchors use GitHub-style slugs: lowercase, spaces to `-`, punctuation dropped, U
 
 Remote URLs, `mailto:` links, links inside code, and targets outside the workspace are never reported. No network access, telemetry or file modification.
 
-## What it does not do
+## Scope
 
-No Typora-style inline WYSIWYG. Zed's extension API does not allow custom editor surfaces. Also no custom preview, wiki-links, backlinks, formatting or code actions.
+Panoptic does not provide Typora-style inline WYSIWYG editing. Zed's extension API does not expose a custom editor surface. It also does not add a custom preview, wiki-links, backlinks, formatting, or code actions.
 
 ## Rendered preview
 
-Use Zed's built-in preview: open a `.md` file, open the Command Palette, search for the Markdown preview action (`markdown: open preview`), and keep editing the source buffer. The preview is a reading view, not a WYSIWYG editor.
+Open a `.md` file, open Zed's Command Palette, and search for **Markdown: Open Preview**. The rendered preview is a reading view; edit the original Markdown source buffer as usual.
 
 ## Installation
 
-1. Command Palette → `zed: extensions` → **Install Dev Extension** → choose this repository's root (the folder with `extension.toml`). Zed needs Rust installed via `rustup` to compile the extension.
-2. Panoptic uses `panoptic-lsp` from your `PATH` if present; otherwise it downloads the binary from the latest GitHub release of `kaiju-no-9/panoptic`.
-3. To build the server yourself: `cargo install --path server` (or `cargo build --release --manifest-path server/Cargo.toml` and put `server/target/release/panoptic-lsp` on your `PATH`).
+1. In Zed's Command Palette, run **zed: extensions**, choose **Install Dev Extension**, and select this repository (the directory containing `extension.toml`). Zed compiles the extension; install Rust with `rustup` if needed.
+2. Panoptic uses `panoptic-lsp` from `PATH` when available. Otherwise, it downloads a matching binary from the latest stable GitHub release of `kaiju-no-9/panoptic`.
+3. To build the server locally, run `cargo build --release --manifest-path server/Cargo.toml`, then add `server/target/release` to `PATH`. Alternatively, run `cargo install --path server`.
 
 ## Supported platforms
 
@@ -48,10 +48,10 @@ cargo test --manifest-path server/Cargo.toml     # server unit + integration tes
 cargo build --release --target wasm32-wasip2     # extension (needs: rustup target add wasm32-wasip2)
 ```
 
-## Status and known limitations
+## Current status and remaining work
 
-- The server is tested standalone (unit tests and an in-process LSP lifecycle test). The extension compiles to WASM. **It has not yet been run inside Zed**, so install it as a dev extension and verify there.
-- The repository URL (`kaiju-no-9/panoptic`) in `extension.toml` and `src/lib.rs` is assumed from your git remote's owner. Change both if it is wrong.
-- Not published to the Zed extension registry.
-- Full-document sync, and documents are re-analysed on each change; very large files may be slow.
-- No inline WYSIWYG rendering.
+- Server unit and integration tests, including an in-process LSP lifecycle test, are present. The extension has been built for WASM. **It still needs validation inside Zed** as a development extension.
+- The release workflow defines builds for macOS (Apple Silicon and Intel), Linux (x86-64 and ARM64), and Windows (x86-64). These release artifacts still need a tagged release and platform validation.
+- Panoptic has not been published to the Zed extension registry.
+- The server uses full-document synchronization and re-analyzes a document after changes; very large files may be slower.
+- Inline WYSIWYG rendering is outside the current Zed extension API and is not part of this project.
