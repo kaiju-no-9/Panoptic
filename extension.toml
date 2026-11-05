@@ -1,6 +1,6 @@
 id = "panoptic"
 name = "Panoptic"
-version = "0.1.0"
+version = "0.1.1"
 schema_version = 1
 authors = ["Nishchay kumar <phoenixgamerx15@gmail.com>"]
 description = "Enhanced Markdown authoring support for Zed"

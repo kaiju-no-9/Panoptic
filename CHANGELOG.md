@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Use currently supported GitHub macOS runners for Apple Silicon and Intel release builds.
+
 ## 0.1.0
 
 - Zed extension attaching `panoptic-lsp` to the built-in Markdown language.
