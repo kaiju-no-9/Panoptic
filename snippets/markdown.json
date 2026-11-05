@@ -1,0 +1,46 @@
+{
+  "Heading 1": {
+    "prefix": "h1",
+    "body": ["# ${1:Heading}"],
+    "description": "Level-one heading"
+  },
+  "Heading 2": {
+    "prefix": "h2",
+    "body": ["## ${1:Heading}"],
+    "description": "Level-two heading"
+  },
+  "Link": {
+    "prefix": "link",
+    "body": ["[${1:text}](${2:./path.md})"],
+    "description": "Markdown link"
+  },
+  "Image": {
+    "prefix": "image",
+    "body": ["![${1:alt text}](${2:./images/image.png})"],
+    "description": "Image with alt text"
+  },
+  "Task": {
+    "prefix": "task",
+    "body": ["- [ ] ${1:task}"],
+    "description": "Task-list item"
+  },
+  "Quote": {
+    "prefix": "quote",
+    "body": ["> ${1:quote}"],
+    "description": "Blockquote"
+  },
+  "Code block": {
+    "prefix": "code",
+    "body": ["```${1:language}", "$2", "```"],
+    "description": "Fenced code block"
+  },
+  "Table": {
+    "prefix": "table",
+    "body": [
+      "| ${1:Column 1} | ${2:Column 2} |",
+      "| --- | --- |",
+      "| ${3:cell} | ${4:cell} |"
+    ],
+    "description": "Two-column table"
+  }
+}

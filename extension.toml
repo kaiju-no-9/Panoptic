@@ -1,0 +1,12 @@
+id = "panoptic"
+name = "Panoptic"
+version = "0.1.0"
+schema_version = 1
+authors = ["Nishchay kumar <phoenixgamerx15@gmail.com>"]
+description = "Enhanced Markdown authoring support for Zed"
+repository = "https://github.com/kaiju-no-9/panoptic"
+snippets = ["./snippets/markdown.json"]
+
+[language_servers.panoptic]
+name = "Panoptic Markdown LSP"
+language = "Markdown"
