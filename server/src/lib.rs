@@ -6,4 +6,5 @@ pub mod document;
 pub mod hover;
 pub mod links;
 pub mod markdown;
+pub mod navigation;
 pub mod server;

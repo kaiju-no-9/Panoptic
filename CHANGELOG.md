@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Add an alt-text quick fix, local link navigation and references, and heading symbols for document and workspace search.
+- Include reference-style Markdown links in link analysis and navigation.
+
 ## 0.1.1
 
 - Use currently supported GitHub macOS runners for Apple Silicon and Intel release builds.
