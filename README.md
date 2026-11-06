@@ -11,8 +11,16 @@ Link completion, diagnostics, hover details, and snippets for ordinary Markdown 
 ![Rust](https://img.shields.io/badge/Rust-extension%20%2B%20LSP-000000?logo=rust)
 
 </div>
+<img width="1469" height="700" alt="22" src="https://github.com/user-attachments/assets/22728823-3f55-457e-8288-161564e95e15" />
 
 ---
+## Demo
+
+See Panoptic in action:
+
+[▶ Watch the demo on X](https://x.com/kumar_nish98725/status/2118458330440200654)
+
+The demo walks through Panoptic's Markdown authoring experience in Zed, including its editor assistance and navigation features.
 
 ## What is Panoptic?
 
