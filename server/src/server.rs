@@ -1,15 +1,17 @@
 use crate::document::{LineIndex, OpenDocument};
-use crate::{completion, diagnostics, hover};
+use crate::{completion, diagnostics, hover, navigation};
 use lsp_server::{Connection, Message, Notification, Request, RequestId, Response};
 use lsp_types::notification::{
     DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
     PublishDiagnostics,
 };
 use lsp_types::{
-    CompletionOptions, CompletionParams, CompletionResponse, DidChangeTextDocumentParams,
-    DidCloseTextDocumentParams, DidOpenTextDocumentParams, HoverParams, HoverProviderCapability,
-    InitializeParams, PublishDiagnosticsParams, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, Url,
+    CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, CompletionOptions,
+    CompletionParams, CompletionResponse, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
+    DidOpenTextDocumentParams, DocumentSymbolParams, GotoDefinitionParams, HoverParams,
+    HoverProviderCapability, InitializeParams, PublishDiagnosticsParams, ReferenceParams,
+    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    WorkspaceSymbolParams,
 };
 use std::collections::HashMap;
 use std::error::Error;
@@ -25,6 +27,11 @@ pub fn capabilities() -> ServerCapabilities {
             ..Default::default()
         }),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
+        code_action_provider: Some(CodeActionProviderCapability::Simple(true)),
+        definition_provider: Some(lsp_types::OneOf::Left(true)),
+        references_provider: Some(lsp_types::OneOf::Left(true)),
+        document_symbol_provider: Some(lsp_types::OneOf::Left(true)),
+        workspace_symbol_provider: Some(lsp_types::OneOf::Left(true)),
         ..Default::default()
     }
 }
@@ -97,6 +104,70 @@ fn handle_request(state: &State, req: Request) -> Response {
             );
             serde_json::to_value(h.flatten())
         }),
+        "textDocument/codeAction" => {
+            serde_json::from_value::<CodeActionParams>(req.params).map(|p| {
+                let uri = p.text_document.uri;
+                let actions = state
+                    .docs
+                    .get(&uri)
+                    .and_then(|doc| {
+                        uri.to_file_path().ok().map(|path| {
+                            navigation::code_actions(&doc.text, &path, &p.context.diagnostics)
+                        })
+                    })
+                    .unwrap_or_default();
+                serde_json::to_value(
+                    actions
+                        .into_iter()
+                        .map(CodeActionOrCommand::CodeAction)
+                        .collect::<Vec<_>>(),
+                )
+            })
+        }
+        "textDocument/definition" => serde_json::from_value::<GotoDefinitionParams>(req.params)
+            .map(|p| {
+                let pos = p.text_document_position_params;
+                let result = with_doc(
+                    state,
+                    &pos.text_document.uri,
+                    pos.position,
+                    |text, off, path| navigation::definition(text, off, path, &state.roots),
+                );
+                serde_json::to_value(result.flatten())
+            }),
+        "textDocument/references" => {
+            serde_json::from_value::<ReferenceParams>(req.params).map(|p| {
+                let pos = p.text_document_position;
+                let result = with_doc(
+                    state,
+                    &pos.text_document.uri,
+                    pos.position,
+                    |text, off, path| {
+                        navigation::references(
+                            text,
+                            off,
+                            path,
+                            &state.roots,
+                            p.context.include_declaration,
+                        )
+                    },
+                );
+                serde_json::to_value(result.unwrap_or_default())
+            })
+        }
+        "textDocument/documentSymbol" => serde_json::from_value::<DocumentSymbolParams>(req.params)
+            .map(|p| {
+                let result = state.docs.get(&p.text_document.uri).and_then(|doc| {
+                    p.text_document
+                        .uri
+                        .to_file_path()
+                        .ok()
+                        .map(|_| navigation::document_symbols(&doc.text))
+                });
+                serde_json::to_value(result.unwrap_or_default())
+            }),
+        "workspace/symbol" => serde_json::from_value::<WorkspaceSymbolParams>(req.params)
+            .map(|p| serde_json::to_value(navigation::workspace_symbols(&state.roots, &p.query))),
         m => return error(id, -32601, format!("method not found: {m}")),
     };
     match result {

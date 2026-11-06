@@ -19,6 +19,7 @@ pub struct Link {
 pub struct Heading {
     pub text: String,
     pub slug: String,
+    pub range: Range<usize>,
 }
 
 #[derive(Debug, Default)]
@@ -89,7 +90,11 @@ pub fn parse(text: &str) -> Parsed {
                             format!("{base}-{n}")
                         };
                         *n += 1;
-                        out.headings.push(Heading { text: h, slug });
+                        out.headings.push(Heading {
+                            text: h,
+                            slug,
+                            range,
+                        });
                     }
                 }
             }

@@ -26,12 +26,15 @@ Panoptic is a Zed extension that makes writing Markdown more reliable. It attach
 | **Heading completion** | Suggests same-file or target-file anchors after `#` in a link. |
 | **Diagnostics** | Warns about missing image alt text, broken local links and images, and missing heading anchors. |
 | **Hover** | Shows local target details and heading information; remote URLs are shown as text only. |
+| **Quick fixes** | Offers a code action to add placeholder alt text to an image flagged for missing alt text. |
+| **Navigation** | Go to the local file or matching heading from a link; find references to the same target. |
+| **Project navigation** | Lists document headings in file symbols and workspace symbol search. |
 | **Snippets** | Provides `h1`, `h2`, `link`, `image`, `task`, `quote`, `code`, and `table`. |
 | **Rendered reading** | Works alongside Zed's built-in Markdown preview. |
 
 Heading anchors use GitHub-style slugs: lowercase, spaces become hyphens, punctuation is dropped, Unicode letters are kept, and repeated headings receive suffixes such as `-1` and `-2`.
 
-Remote URLs, `mailto:` links, links inside code, and targets outside the workspace are excluded from local-reference diagnostics. Panoptic does not fetch URLs, send telemetry, or modify files automatically.
+Remote URLs, `mailto:` links, links inside code, and targets outside the workspace are excluded from local-reference diagnostics. Reference-style Markdown links participate in parsing and navigation. Panoptic does not fetch URLs, send telemetry, or modify files automatically.
 
 ## Install for development
 
@@ -109,7 +112,7 @@ To build only the native server, run `cargo build --release --manifest-path serv
 ## Limitations
 
 - No Typora-style inline WYSIWYG editing; Zed's public extension API does not provide a custom editor surface.
-- No custom Markdown preview, wiki-links, backlinks, formatting, or code actions.
+- No custom Markdown preview, wiki-link syntax, formatting, or automatic edits. The missing-alt quick fix inserts editable placeholder text.
 - Documents use full-text synchronization and are re-analyzed after changes, so very large Markdown files may take longer.
 - The extension has not been published to the Zed registry.
 
