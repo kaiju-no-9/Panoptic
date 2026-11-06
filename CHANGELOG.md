@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Update lifecycle capability expectations for the new code actions and workspace symbols.
+
 ## 0.1.2
 
 - Add an alt-text quick fix, local link navigation and references, and heading symbols for document and workspace search.
