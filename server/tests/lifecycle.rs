@@ -65,12 +65,15 @@ fn full_lifecycle() {
     );
     let caps = &init["capabilities"];
     assert!(caps["completionProvider"].is_object() && caps["hoverProvider"] == true);
+    assert_eq!(caps["codeActionProvider"], true);
+    assert_eq!(caps["definitionProvider"], true);
+    assert_eq!(caps["referencesProvider"], true);
+    assert_eq!(caps["documentSymbolProvider"], true);
+    assert_eq!(caps["workspaceSymbolProvider"], true);
     for unsupported in [
         "documentFormattingProvider",
         "renameProvider",
-        "codeActionProvider",
         "semanticTokensProvider",
-        "workspaceSymbolProvider",
     ] {
         assert!(
             caps.get(unsupported).is_none(),
