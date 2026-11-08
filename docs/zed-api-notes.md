@@ -1,6 +1,6 @@
 # Zed API notes
 
-Verified against `zed_extension_api = "0.7.0"` (crates.io, current at build time) by compiling `src/lib.rs` for `wasm32-wasip2`. Not yet verified inside a running Zed (see README "Status").
+Verified against `zed_extension_api = "0.7.0"` (crates.io, current at build time) by compiling `src/lib.rs` for `wasm32-wasip2`. Has been  verified inside a running Zed (see README "Status").
 
 - Extension crate: `crate-type = ["cdylib"]`, target `wasm32-wasip2`.
 - Trait: `Extension::language_server_command(&mut self, &LanguageServerId, &Worktree) -> Result<Command>`.
